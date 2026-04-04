@@ -1,0 +1,82 @@
+import { Car, Wrench, Disc, Layers, Sparkles, Package } from 'lucide-react'
+
+export const services = [
+  {
+    id: 'carrosserie',
+    icon: Car,
+    title: 'Carrosserie',
+    shortDesc: 'Réparation, débosselage, retouche peinture — résultat invisible garanti.',
+    description: [
+      'Notre atelier carrosserie prend en charge tous types d\'interventions : débosselage sans peinture (PDR) pour les petites déformations, réparation des chocs et accrochages, retouche peinture teintée à la teinte exacte de votre véhicule.',
+      'Nous travaillons avec un coloriste expérimenté disposant d\'une base de données de milliers de teintes constructeur. L\'application se fait en cabine ventilée pour un rendu professionnel et durable.',
+      'Que ce soit un simple rayure ou un choc plus important, nous vous proposons un devis gratuit et transparent avant toute intervention. Toutes marques acceptées.',
+    ],
+    slug: 'carrosserie',
+    price: null,
+  },
+  {
+    id: 'mecanique',
+    icon: Wrench,
+    title: 'Mécanique',
+    shortDesc: 'Entretien, révision complète, réparation — taux horaire 80€/h.',
+    description: [
+      'Notre équipe de mécaniciens certifiés intervient sur tous les systèmes de votre véhicule : moteur, boîte de vitesses, embrayage, distribution, suspension et direction. Nous pratiquons un taux horaire transparent de 80€/h, sans mauvaise surprise.',
+      'Pour l\'entretien courant, nous réalisons les vidanges moteur à partir de 69€ (filtre inclus) et les révisions complètes à partir de 149€, selon les préconisations constructeur. Huiles de qualité, pièces d\'origine ou équivalent homologué.',
+      'Chaque intervention est tracée et documentée. Nous vous expliquons les travaux effectués et vous avertissons de tout point nécessitant attention avant que la situation ne s\'aggrave.',
+    ],
+    slug: 'mecanique',
+    price: '80€/h',
+  },
+  {
+    id: 'freinage',
+    icon: Disc,
+    title: 'Freinage',
+    shortDesc: 'Plaquettes AV 79€, disques + plaquettes 179€ — sécurité maximale.',
+    description: [
+      'Le freinage est le système de sécurité le plus critique de votre véhicule. Nous intervenons sur l\'ensemble de la chaîne de freinage : plaquettes avant (79€), disques + plaquettes (179€), étriers, flexibles et liquide de frein.',
+      'Chaque remplacement est suivi d\'un test de freinage complet. Nous utilisons des pièces de qualité OEM ou équivalent pour vous garantir des performances optimales et une durabilité maximale.',
+      'Si vous entendez un grincement, ressentez des vibrations au freinage ou si votre pédale manque de fermeté, venez nous voir — le diagnostic freinage est offert.',
+    ],
+    slug: 'freinage',
+    price: 'Plaquettes 79€',
+  },
+  {
+    id: 'pare-brise',
+    icon: Layers,
+    title: 'Pare-brise',
+    shortDesc: 'Réparation d\'impact et remplacement pare-brise toutes marques.',
+    description: [
+      'Un impact sur votre pare-brise peut souvent être réparé rapidement sans remplacement, à condition d\'intervenir à temps. Nous évaluons gratuitement si l\'impact est réparable ou si un remplacement est nécessaire.',
+      'Pour les remplacements, nous utilisons des vitrages homologués conformes aux normes de sécurité en vigueur. L\'intervention est réalisée en atelier avec un temps de séchage respecté pour une fixation optimale.',
+      'Nous prenons en charge les démarches avec votre assurance et travaillons avec tous les assureurs. Intervention disponible sur rendez-vous, souvent le jour même.',
+    ],
+    slug: 'pare-brise',
+    price: null,
+  },
+  {
+    id: 'nettoyage',
+    icon: Sparkles,
+    title: 'Nettoyage Auto',
+    shortDesc: 'Lavage intérieur + extérieur complet à partir de 40€.',
+    description: [
+      'Nous proposons un service de nettoyage automobile complet : lavage extérieur, décontamination de la carrosserie, nettoyage et aspiratage intérieur, détail des plastiques et vitres — le tout à partir de 40€.',
+      'Notre prestation intérieur + extérieur est réalisée à la main avec des produits professionnels adaptés à chaque surface. Résultat impeccable, sans risque pour votre carrosserie ou vos garnitures.',
+      'Combinez le nettoyage avec une révision ou un entretien pour optimiser votre passage chez nous et repartir avec un véhicule à la fois en parfait état mécanique et impeccable visuellement.',
+    ],
+    slug: 'nettoyage-auto',
+    price: 'À partir de 40€',
+  },
+  {
+    id: 'pieces',
+    icon: Package,
+    title: 'Pièces Détachées',
+    shortDesc: 'Vente de pièces toutes marques — achat, vente, conseil.',
+    description: [
+      'S.E Garage dispose d\'un stock de pièces détachées et vous propose la commande rapide de toute pièce pour votre véhicule. Vente au comptoir pour les particuliers et les professionnels, toutes marques.',
+      'Nous vous conseillons sur le choix entre pièce d\'origine constructeur, équipementier premium (Bosch, NGK, Valeo...) ou pièce économique selon votre budget et l\'usage de votre véhicule.',
+      'Achat de véhicules en panne ou accidentés. Renseignez-vous directement au garage pour nos conditions de rachat.',
+    ],
+    slug: 'pieces-detachees',
+    price: null,
+  },
+]
