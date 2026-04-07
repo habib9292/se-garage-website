@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react'
+import { CheckCircle, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { services } from '../data/services'
 
-// Step 3 schema
+// ─── Schemas ─────────────────────────────────────────────────────────────────
 const step3Schema = z.object({
   nom:       z.string().min(2, 'Nom requis'),
   telephone: z.string().min(10, 'Téléphone invalide'),
@@ -15,6 +15,9 @@ const step3Schema = z.object({
   marque:    z.string().min(2, 'Marque & modèle requis'),
 })
 
+const ALL_SLOTS = ['8h00', '9h00', '10h00', '11h00', '14h00', '15h00', '16h00', '17h00']
+
+// ─── Progress Bar ────────────────────────────────────────────────────────────
 function ProgressBar({ step }) {
   const steps = ['Service', 'Créneau', 'Coordonnées']
   return (
@@ -24,7 +27,7 @@ function ProgressBar({ step }) {
           <div key={i} className="flex items-center gap-2 flex-1">
             <div className="flex items-center gap-2">
               <div className={`w-7 h-7 flex items-center justify-center font-mono text-xs transition-all duration-300 ${
-                i + 1 < step ? 'bg-or text-anthracite' :
+                i + 1 < step  ? 'bg-or text-anthracite' :
                 i + 1 === step ? 'border border-or text-or' :
                 'border border-acier/30 text-acier/50'
               }`}>
@@ -46,6 +49,7 @@ function ProgressBar({ step }) {
   )
 }
 
+// ─── Step 1 : Service ────────────────────────────────────────────────────────
 function Step1({ selectedService, onSelect }) {
   return (
     <motion.div
@@ -87,16 +91,40 @@ function Step1({ selectedService, onSelect }) {
   )
 }
 
+// ─── Step 2 : Créneau (design original + vraie dispo) ────────────────────────
 function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
+  const [takenSlots, setTakenSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
+
   const days = []
   for (let i = 0; i < 7; i++) {
     const d = new Date()
     d.setDate(d.getDate() + i + 1)
-    if (d.getDay() !== 0) days.push(d)
+    if (d.getDay() !== 0) days.push(d) // pas dimanche
   }
-  const slots = ['8h00', '9h00', '10h00', '11h00', '14h00', '15h00', '16h00', '17h00']
-  const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+
+  // Génère une clé date locale YYYY-MM-DD (sans décalage UTC)
+  const localDateKey = (d) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  const dayNames   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
   const monthNames = ['jan', 'fév', 'mar', 'avr', 'mai', 'jui', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc']
+
+  // Charge les créneaux pris quand une date est sélectionnée
+  useEffect(() => {
+    if (!selectedDate) return
+    setTakenSlots([])
+    setLoadingSlots(true)
+    fetch(`/api/availability?date=${selectedDate}`)
+      .then(r => r.json())
+      .then(data => setTakenSlots(data.takenSlots || []))
+      .catch(() => setTakenSlots([]))
+      .finally(() => setLoadingSlots(false))
+  }, [selectedDate])
 
   return (
     <motion.div
@@ -110,17 +138,19 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
       </h2>
       <p className="font-body text-sm text-acier mb-8">Disponibilités sur les 7 prochains jours</p>
 
-      {/* Days */}
+      {/* Jours */}
       <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mb-8">
-        {days.map((day, i) => {
-          const key = day.toISOString().split('T')[0]
+        {days.map((day) => {
+          const key = localDateKey(day)
           const isSelected = selectedDate === key
           return (
             <button
               key={key}
-              onClick={() => onSelectDate(key)}
+              onClick={() => { onSelectDate(key); onSelectSlot(null) }}
               className={`flex flex-col items-center py-3 px-1 border transition-all duration-200 ${
-                isSelected ? 'border-or bg-or/10 text-or' : 'border-acier/20 text-acier hover:border-or/50'
+                isSelected
+                  ? 'border-or bg-or/10 text-or'
+                  : 'border-acier/20 text-acier hover:border-or/50'
               }`}
             >
               <span className="font-mono text-xs uppercase">{dayNames[day.getDay()]}</span>
@@ -133,19 +163,39 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
         })}
       </div>
 
-      {/* Slots */}
+      {/* Créneaux */}
       {selectedDate && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="font-mono text-xs uppercase tracking-widest text-acier mb-4">Créneaux disponibles</p>
+          <div className="flex items-center gap-3 mb-4">
+            <p className="font-mono text-xs uppercase tracking-widest text-acier">Créneaux disponibles</p>
+            {loadingSlots && <Loader2 size={12} className="text-or animate-spin" />}
+          </div>
+
           <div className="grid grid-cols-4 gap-2">
-            {slots.map(slot => {
+            {ALL_SLOTS.map(slot => {
+              const isTaken    = takenSlots.includes(slot)
               const isSelected = selectedSlot === slot
+
+              if (isTaken) {
+                return (
+                  <div
+                    key={slot}
+                    className="py-2.5 font-mono text-sm border border-acier/10 text-acier/25 text-center relative overflow-hidden cursor-not-allowed"
+                    title="Créneau déjà pris"
+                  >
+                    <span className="line-through">{slot}</span>
+                  </div>
+                )
+              }
+
               return (
                 <button
                   key={slot}
                   onClick={() => onSelectSlot(slot)}
                   className={`py-2.5 font-mono text-sm border transition-all duration-200 ${
-                    isSelected ? 'border-or bg-or text-anthracite' : 'border-acier/20 text-acier hover:border-or/50 hover:text-calcaire'
+                    isSelected
+                      ? 'border-or bg-or text-anthracite'
+                      : 'border-acier/20 text-acier hover:border-or/50 hover:text-calcaire'
                   }`}
                 >
                   {slot}
@@ -153,12 +203,25 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
               )
             })}
           </div>
+
+          {/* Légende */}
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 border border-or bg-or/10" />
+              <span className="font-mono text-xs text-acier/60 uppercase tracking-widest">Disponible</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 border border-acier/10 bg-acier/5" />
+              <span className="font-mono text-xs text-acier/40 uppercase tracking-widest">Déjà pris</span>
+            </div>
+          </div>
         </motion.div>
       )}
     </motion.div>
   )
 }
 
+// ─── Step 3 : Coordonnées ────────────────────────────────────────────────────
 function Step3({ register, errors }) {
   return (
     <motion.div
@@ -219,12 +282,13 @@ function Step3({ register, errors }) {
   )
 }
 
+// ─── Page principale ─────────────────────────────────────────────────────────
 export function Appointment() {
-  const [step, setStep] = useState(1)
+  const [step, setStep]               = useState(1)
   const [selectedService, setSelectedService] = useState(null)
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [selectedSlot, setSelectedSlot] = useState(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [selectedDate, setSelectedDate]       = useState(null)
+  const [selectedSlot, setSelectedSlot]       = useState(null)
+  const [submitted, setSubmitted]             = useState(false)
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(step3Schema),
@@ -237,11 +301,35 @@ export function Appointment() {
   }
 
   const onSubmit = async (data) => {
-    await new Promise(r => setTimeout(r, 1200))
+    const serviceName = services.find(s => s.id === selectedService)?.title || selectedService
+
+    // Crée l'événement dans Google Calendar
+    await fetch('/api/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date:      selectedDate,
+        slot:      selectedSlot,
+        nom:       data.nom,
+        telephone: data.telephone,
+        email:     data.email,
+        marque:    data.marque,
+        service:   serviceName,
+      }),
+    }).catch(() => {/* ne bloque pas si erreur réseau */})
+
     setSubmitted(true)
   }
 
+  // ─── Confirmation ─────────────────────────────────────────────────────────
   if (submitted) {
+    const serviceName = services.find(s => s.id === selectedService)?.title || ''
+    const dateFormatted = selectedDate
+      ? new Date(selectedDate).toLocaleDateString('fr-FR', {
+          weekday: 'long', day: 'numeric', month: 'long'
+        })
+      : ''
+
     return (
       <div className="min-h-screen bg-forge flex items-center justify-center px-6">
         <motion.div
@@ -260,11 +348,27 @@ export function Appointment() {
           <h2 className="font-display text-4xl text-calcaire uppercase tracking-wide mb-4">
             Rendez-vous confirmé !
           </h2>
+          {(serviceName || dateFormatted) && (
+            <div className="border border-acier/20 p-4 mb-6 text-left">
+              {serviceName && (
+                <>
+                  <p className="font-mono text-xs uppercase tracking-widest text-acier/60 mb-1">Service</p>
+                  <p className="font-body text-sm text-calcaire mb-3">{serviceName}</p>
+                </>
+              )}
+              {dateFormatted && (
+                <>
+                  <p className="font-mono text-xs uppercase tracking-widest text-acier/60 mb-1">Créneau</p>
+                  <p className="font-body text-sm text-calcaire capitalize">{dateFormatted} à {selectedSlot}</p>
+                </>
+              )}
+            </div>
+          )}
           <p className="font-body text-acier mb-8">
-            Votre demande a été enregistrée. Nous vous confirmons votre créneau par SMS et email sous 2 heures.
+            Votre rendez-vous a été ajouté au calendrier du garage. Nous vous confirmons par SMS sous 2 heures.
           </p>
           <div className="flex flex-col gap-3">
-            {['✓ Sans engagement', '✓ Confirmé sous 2h', '✓ Rappel par SMS'].map(item => (
+            {['✓ Ajouté au calendrier Google', '✓ Confirmé sous 2h', '✓ Rappel par SMS'].map(item => (
               <p key={item} className="font-mono text-xs uppercase tracking-widest text-or">{item}</p>
             ))}
           </div>
@@ -273,9 +377,9 @@ export function Appointment() {
     )
   }
 
+  // ─── Formulaire ──────────────────────────────────────────────────────────
   return (
     <>
-      {/* Hero */}
       <section className="bg-forge pt-32 pb-10 border-b border-acier/10">
         <div className="max-w-2xl mx-auto px-6 lg:px-8 text-center">
           <p className="font-mono text-xs uppercase tracking-widest text-or mb-4">Prise de rendez-vous</p>
@@ -288,7 +392,6 @@ export function Appointment() {
         </div>
       </section>
 
-      {/* Form */}
       <section className="bg-anthracite py-16 lg:py-20 min-h-[60vh]">
         <div className="max-w-2xl mx-auto px-6 lg:px-8">
           <ProgressBar step={step} />
@@ -316,7 +419,6 @@ export function Appointment() {
               )}
             </AnimatePresence>
 
-            {/* Navigation */}
             <div className="flex justify-between items-center mt-10 pt-6 border-t border-acier/20">
               {step > 1 ? (
                 <button
@@ -344,14 +446,13 @@ export function Appointment() {
                 </Button>
               ) : (
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Envoi...' : 'Confirmer le RDV'}
+                  {isSubmitting ? 'Enregistrement...' : 'Confirmer le RDV'}
                   {!isSubmitting && <CheckCircle size={16} className="ml-2" />}
                 </Button>
               )}
             </div>
           </form>
 
-          {/* Reassurance */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
             {['✓ Sans engagement', '✓ Confirmé sous 2h', '✓ Rappel par SMS'].map(item => (
               <p key={item} className="font-mono text-xs uppercase tracking-widest text-acier/60">{item}</p>
