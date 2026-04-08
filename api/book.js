@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     const endDateTime   = `${date}T${pad(h + 1)}:${pad(m || 0)}:00`
 
     await calendar.events.insert({
-      calendarId: process.env.GOOGLE_CALENDAR_ID,
+      calendarId:  process.env.GOOGLE_CALENDAR_ID,
+      sendUpdates: 'all', // envoie les emails à tous les participants
       requestBody: {
         summary:     `RDV — ${nom} — ${service}`,
         description: [
@@ -44,6 +45,10 @@ export default async function handler(req, res) {
         start: { dateTime: startDateTime, timeZone: 'Europe/Paris' },
         end:   { dateTime: endDateTime,   timeZone: 'Europe/Paris' },
         colorId: '6',
+        attendees: [
+          { email: email,                              displayName: nom },
+          { email: process.env.GOOGLE_CALENDAR_ID,   displayName: 'S.E Garage' },
+        ],
       },
     })
 
