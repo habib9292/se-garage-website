@@ -1,10 +1,5 @@
 import { google } from 'googleapis'
 
-function slotToTime(slot) {
-  const [h, m] = slot.replace('h', ':').split(':').map(Number)
-  return { h, m: m || 0 }
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -28,12 +23,12 @@ export default async function handler(req, res) {
 
     const calendar = google.calendar({ version: 'v3', auth })
 
-    const { h, m } = slotToTime(slot)
+    const [h, m] = slot.replace('h', ':').split(':').map(Number)
     const pad = n => String(n).padStart(2, '0')
 
-    // Format ISO avec timezone Paris explicite pour éviter le décalage UTC
-    const startDateTime = `${date}T${pad(h)}:${pad(m)}:00+02:00`
-    const endDateTime   = `${date}T${pad(h + 1)}:${pad(m)}:00+02:00`
+    // Pas d'offset UTC hardcodé — on laisse Google gérer CET/CEST via timeZone
+    const startDateTime = `${date}T${pad(h)}:${pad(m || 0)}:00`
+    const endDateTime   = `${date}T${pad(h + 1)}:${pad(m || 0)}:00`
 
     await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
@@ -48,13 +43,15 @@ export default async function handler(req, res) {
         ].join('\n'),
         start: { dateTime: startDateTime, timeZone: 'Europe/Paris' },
         end:   { dateTime: endDateTime,   timeZone: 'Europe/Paris' },
-        colorId: '6', // bleu
+        colorId: '6',
       },
     })
 
+    console.log(`[book] RDV créé: ${nom} le ${date} à ${slot}`)
     res.json({ success: true })
+
   } catch (err) {
-    console.error(err)
+    console.error('[book] error:', err.message)
     res.status(500).json({ error: 'Erreur création RDV', details: err.message })
   }
 }

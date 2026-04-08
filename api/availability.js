@@ -7,6 +7,20 @@ function slotToMinutes(slot) {
   return h * 60 + (m || 0)
 }
 
+// Convertit une date ISO en minutes depuis minuit — heure Paris (gère CET et CEST)
+function toParisMinutes(isoString) {
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris',
+    hour:   '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date(isoString))
+
+  const h = parseInt(parts.find(p => p.type === 'hour').value)
+  const m = parseInt(parts.find(p => p.type === 'minute').value)
+  return h * 60 + m
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -19,19 +33,19 @@ export default async function handler(req, res) {
     const auth = new google.auth.JWT({
       email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
       key:   process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+      scopes: ['https://www.googleapis.com/auth/calendar'],
     })
 
     const calendar = google.calendar({ version: 'v3', auth })
 
-    // Force timezone Paris (UTC+1 hiver / UTC+2 été) — on prend large des deux côtés
+    // Large plage horaire pour couvrir CET (UTC+1) et CEST (UTC+2)
     const timeMin = new Date(`${date}T00:00:00+01:00`)
     const timeMax = new Date(`${date}T23:59:59+02:00`)
 
     const { data } = await calendar.freebusy.query({
       requestBody: {
-        timeMin: timeMin.toISOString(),
-        timeMax: timeMax.toISOString(),
+        timeMin:  timeMin.toISOString(),
+        timeMax:  timeMax.toISOString(),
         timeZone: 'Europe/Paris',
         items: [{ id: process.env.GOOGLE_CALENDAR_ID }],
       },
@@ -40,16 +54,14 @@ export default async function handler(req, res) {
     const busyPeriods = data.calendars?.[process.env.GOOGLE_CALENDAR_ID]?.busy || []
     console.log(`[availability] date=${date} busyPeriods=${JSON.stringify(busyPeriods)}`)
 
-    // Vérifie chaque créneau contre les périodes occupées
+    // Compare en heure Paris grâce à Intl.DateTimeFormat
     const takenSlots = SLOTS.filter(slot => {
       const slotStart = slotToMinutes(slot)
       const slotEnd   = slotStart + 60
 
       return busyPeriods.some(period => {
-        const busyStart = new Date(period.start)
-        const busyEnd   = new Date(period.end)
-        const bStart = busyStart.getHours() * 60 + busyStart.getMinutes()
-        const bEnd   = busyEnd.getHours()   * 60 + busyEnd.getMinutes()
+        const bStart = toParisMinutes(period.start)
+        const bEnd   = toParisMinutes(period.end)
         // Chevauchement
         return slotStart < bEnd && slotEnd > bStart
       })
@@ -57,8 +69,9 @@ export default async function handler(req, res) {
 
     console.log(`[availability] takenSlots=${JSON.stringify(takenSlots)}`)
     res.json({ date, takenSlots })
+
   } catch (err) {
-    console.error(err)
+    console.error('[availability] error:', err.message)
     res.status(500).json({ error: 'Erreur Google Calendar', details: err.message })
   }
 }
