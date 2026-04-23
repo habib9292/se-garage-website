@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react'
 // Horaires du garage S.E Garage
 // jour 0 = Dimanche, 1 = Lundi, ..., 6 = Samedi
 const SCHEDULE = {
-  0: null,               // Dimanche : fermé
-  1: { open: 8,  close: 19 }, // Lundi
-  2: { open: 8,  close: 19 }, // Mardi
-  3: { open: 8,  close: 19 }, // Mercredi
-  4: { open: 8,  close: 19 }, // Jeudi
-  5: { open: 8,  close: 19 }, // Vendredi
-  6: { open: 9,  close: 17 }, // Samedi
+  0: null,                      // Dimanche : fermé
+  1: { open: 8.5, close: 18 }, // Lundi    08h30–18h00
+  2: { open: 8.5, close: 18 }, // Mardi    08h30–18h00
+  3: { open: 8.5, close: 18 }, // Mercredi 08h30–18h00
+  4: { open: 8.5, close: 18 }, // Jeudi    08h30–18h00
+  5: { open: 8.5, close: 18 }, // Vendredi 08h30–18h00
+  6: { open: 8.5, close: 18 }, // Samedi   08h30–18h00
 }
 
 const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
