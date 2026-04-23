@@ -36,11 +36,11 @@ export function CTABanner() {
               Prendre rendez-vous
             </Link>
             <a
-              href="tel:0622133447"
+              href="tel:0141114340"
               className="flex items-center justify-center gap-3 text-anthracite font-body font-semibold px-9 py-4 border-2 border-anthracite hover:bg-anthracite hover:text-or transition-all duration-200 w-full sm:w-auto"
             >
               <Phone size={18} />
-              06 22 13 34 47
+              01 41 11 43 40
             </a>
           </div>
         </motion.div>

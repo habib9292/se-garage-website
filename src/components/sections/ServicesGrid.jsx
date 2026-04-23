@@ -15,8 +15,21 @@ function ServiceCard({ service, index }) {
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
-      className="group bg-forge border border-acier/10 p-8 flex flex-col transition-all duration-200 hover:border-or/50 hover:bg-anthracite"
+      className="group bg-forge border border-acier/10 flex flex-col transition-all duration-200 hover:border-or/50 hover:bg-anthracite overflow-hidden"
     >
+      {/* Image */}
+      {service.image && (
+        <div className="relative h-44 overflow-hidden">
+          <img
+            src={service.image}
+            alt={service.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-forge/80 to-transparent" />
+        </div>
+      )}
+      <div className="p-8 flex flex-col flex-1">
       <div className="mb-6">
         <div className="w-12 h-12 border border-or/30 flex items-center justify-center mb-4 group-hover:bg-or group-hover:border-or transition-all duration-200">
           <Icon size={22} className="text-or group-hover:text-anthracite transition-colors duration-200" />
@@ -40,6 +53,7 @@ function ServiceCard({ service, index }) {
         En savoir plus
         <ArrowRight size={14} />
       </Link>
+      </div>
     </motion.div>
   )
 }

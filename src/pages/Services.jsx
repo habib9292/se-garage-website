@@ -62,15 +62,27 @@ function ServiceSection({ service, index }) {
             transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className={!isEven ? 'lg:col-start-1 lg:row-start-1' : ''}
           >
-            <div className="aspect-[4/3] bg-forge/80 border border-acier/10 relative overflow-hidden">
-              <div className={`absolute inset-0 bg-gradient-to-br ${isEven ? 'from-anthracite to-forge' : 'from-forge to-anthracite'}`} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Icon size={96} className="text-or/10" />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-forge/80 to-transparent">
-                <p className="font-mono text-xs uppercase tracking-widest text-acier">
-                  {service.title}
-                </p>
+            <div className="aspect-[4/3] relative overflow-hidden">
+              {service.image ? (
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className={`absolute inset-0 bg-gradient-to-br ${isEven ? 'from-anthracite to-forge' : 'from-forge to-anthracite'}`} />
+              )}
+              {/* Label bas */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 border border-or/40 flex items-center justify-center">
+                    <Icon size={14} className="text-or" />
+                  </div>
+                  <p className="font-mono text-xs uppercase tracking-widest text-calcaire/80">
+                    {service.title}
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>

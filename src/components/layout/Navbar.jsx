@@ -44,7 +44,7 @@ export function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <span className="font-display text-2xl lg:text-3xl tracking-widest text-calcaire group-hover:text-or transition-colors duration-200">
-                S.E<span className="text-or ml-2">GARAGE</span>
+                <span className="text-or">S.E</span><span className="text-calcaire ml-2">GARAGE</span>
               </span>
             </Link>
 
@@ -69,11 +69,11 @@ export function Navbar() {
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-4">
               <a
-                href="tel:0622133447"
+                href="tel:0141114340"
                 className="flex items-center gap-2 font-mono text-xs tracking-widest text-acier hover:text-or transition-colors duration-200"
               >
                 <Phone size={14} />
-                06 22 13 34 47
+                01 41 11 43 40
               </a>
               <Link to="/rendez-vous">
                 <Button size="sm">Prendre RDV</Button>
@@ -113,7 +113,7 @@ export function Navbar() {
             >
               <div className="flex items-center justify-between p-6 border-b border-acier/20">
                 <span className="font-display text-2xl tracking-widest">
-                  S.E<span className="text-or ml-2">GARAGE</span>
+                  <span className="text-or">S.E</span><span className="text-calcaire ml-2">GARAGE</span>
                 </span>
                 <button onClick={() => setMenuOpen(false)} className="text-calcaire p-1">
                   <X size={24} />
@@ -142,11 +142,11 @@ export function Navbar() {
 
               <div className="p-6 border-t border-acier/20 space-y-3">
                 <a
-                  href="tel:0622133447"
+                  href="tel:0141114340"
                   className="flex items-center gap-3 font-mono text-sm text-acier hover:text-or transition-colors"
                 >
                   <Phone size={16} />
-                  06 22 13 34 47
+                  01 41 11 43 40
                 </a>
                 <Link
                   to="/rendez-vous"

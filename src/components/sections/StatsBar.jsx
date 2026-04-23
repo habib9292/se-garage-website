@@ -35,7 +35,7 @@ function AnimatedNumber({ target, suffix = '', prefix = '' }) {
 
 const stats = [
   { value: 80,  prefix: '',  suffix: '€/h',  label: 'Taux horaire mécanique',  sublabel: 'prix transparent, toutes marques' },
-  { value: 69,  prefix: '',  suffix: '€',    label: 'Vidange + filtre',         sublabel: 'révision complète dès 149€' },
+  { value: 79,  prefix: '',  suffix: '€',    label: 'Vidange + filtre',         sublabel: 'révision complète dès 179€' },
   { value: 179, prefix: '',  suffix: '€',    label: 'Disques + plaquettes',     sublabel: 'plaquettes seules dès 79€' },
 ]
 

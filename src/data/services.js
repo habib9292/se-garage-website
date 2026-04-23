@@ -1,9 +1,10 @@
-import { Car, Wrench, Disc, Layers, Sparkles, Package } from 'lucide-react'
+import { IconCarrosserie, IconMecanique, IconFreinage, IconPareBrise, IconNettoyage, IconPieces } from '../components/ui/ServiceIcons'
 
 export const services = [
   {
     id: 'carrosserie',
-    icon: Car,
+    icon: IconCarrosserie,
+    image: 'https://images.unsplash.com/photo-1767681092416-bccf9410bda4?w=900&q=85&auto=format&fit=crop',
     title: 'Carrosserie',
     shortDesc: 'Réparation, débosselage, retouche peinture — résultat invisible garanti.',
     description: [
@@ -16,12 +17,13 @@ export const services = [
   },
   {
     id: 'mecanique',
-    icon: Wrench,
+    icon: IconMecanique,
+    image: 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=900&q=85&auto=format&fit=crop',
     title: 'Mécanique',
     shortDesc: 'Entretien, révision complète, réparation — taux horaire 80€/h.',
     description: [
       'Notre équipe de mécaniciens certifiés intervient sur tous les systèmes de votre véhicule : moteur, boîte de vitesses, embrayage, distribution, suspension et direction. Nous pratiquons un taux horaire transparent de 80€/h, sans mauvaise surprise.',
-      'Pour l\'entretien courant, nous réalisons les vidanges moteur à partir de 69€ (filtre inclus) et les révisions complètes à partir de 149€, selon les préconisations constructeur. Huiles de qualité, pièces d\'origine ou équivalent homologué.',
+      'Pour l\'entretien courant, nous réalisons les vidanges moteur à partir de 79€ (filtre inclus) et les révisions complètes à partir de 179€, selon les préconisations constructeur. Huiles de qualité, pièces d\'origine ou équivalent homologué.',
       'Chaque intervention est tracée et documentée. Nous vous expliquons les travaux effectués et vous avertissons de tout point nécessitant attention avant que la situation ne s\'aggrave.',
     ],
     slug: 'mecanique',
@@ -29,7 +31,8 @@ export const services = [
   },
   {
     id: 'freinage',
-    icon: Disc,
+    icon: IconFreinage,
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85&auto=format&fit=crop',
     title: 'Freinage',
     shortDesc: 'Plaquettes AV 79€, disques + plaquettes 179€ — sécurité maximale.',
     description: [
@@ -42,7 +45,8 @@ export const services = [
   },
   {
     id: 'pare-brise',
-    icon: Layers,
+    icon: IconPareBrise,
+    image: 'https://images.unsplash.com/photo-1525318918729-f0d695cc5573?w=900&q=85&auto=format&fit=crop',
     title: 'Pare-brise',
     shortDesc: 'Réparation d\'impact et remplacement pare-brise toutes marques.',
     description: [
@@ -55,7 +59,8 @@ export const services = [
   },
   {
     id: 'nettoyage',
-    icon: Sparkles,
+    icon: IconNettoyage,
+    image: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=900&q=85&auto=format&fit=crop',
     title: 'Nettoyage Auto',
     shortDesc: 'Lavage intérieur + extérieur complet à partir de 40€.',
     description: [
@@ -68,7 +73,8 @@ export const services = [
   },
   {
     id: 'pieces',
-    icon: Package,
+    icon: IconPieces,
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=900&q=85&auto=format&fit=crop',
     title: 'Pièces Détachées',
     shortDesc: 'Vente de pièces toutes marques — achat, vente, conseil.',
     description: [

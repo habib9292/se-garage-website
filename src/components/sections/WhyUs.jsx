@@ -37,42 +37,55 @@ export function WhyUs() {
               animate={imgVisible ? { clipPath: 'inset(0 0% 0 0)' } : {}}
               transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
             >
-              {/* Placeholder image with atmospheric design */}
-              <div className="aspect-[4/3] bg-anthracite relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-anthracite to-forge" />
-                {/* Decorative mechanical grid */}
-                <div className="absolute inset-0 opacity-20">
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-px bg-acier h-full"
-                      style={{ left: `${(i + 1) * 12.5}%` }}
-                    />
-                  ))}
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute h-px bg-acier w-full"
-                      style={{ top: `${(i + 1) * 16.67}%` }}
-                    />
-                  ))}
-                </div>
-                {/* Central motif */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32 h-32 border border-or/40 rotate-45 flex items-center justify-center">
-                    <div className="w-20 h-20 border border-or/20 rotate-0">
-                      <div className="w-full h-full border border-or/10" />
-                    </div>
+              {/* Logo SPORT style-10 */}
+              <div
+                className="aspect-[16/9] lg:aspect-[4/3] w-full flex items-center justify-center overflow-hidden select-none"
+                style={{
+                  background: 'linear-gradient(145deg, #0d0d0d 0%, #1a1a1a 40%, #111 100%)',
+                  backgroundImage: 'linear-gradient(145deg, #0d0d0d 0%, #1a1a1a 40%, #111 100%), radial-gradient(ellipse at 50% 50%, rgba(232,93,34,0.10) 0%, transparent 65%), repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 12px)',
+                  backgroundBlendMode: 'normal, screen, overlay',
+                  position: 'relative',
+                }}
+              >
+                {/* Glow orange centré */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: 'radial-gradient(ellipse at 50% 50%, rgba(232,93,34,0.12) 0%, transparent 60%)',
+                  pointerEvents: 'none',
+                }} />
+                {/* Logo : 3 barres + S.E GARAGE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px, 2.5vw, 28px)', position: 'relative', zIndex: 1 }}>
+                  {/* 3 barres décroissantes */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 12px)' }}>
+                    <div style={{ width: 'clamp(44px, 7vw, 80px)', height: 7, background: '#e85d22', borderRadius: 4, boxShadow: '0 0 18px rgba(232,93,34,0.9)' }} />
+                    <div style={{ width: 'clamp(30px, 5vw, 55px)', height: 7, background: 'rgba(255,255,255,0.4)', borderRadius: 4 }} />
+                    <div style={{ width: 'clamp(16px, 3vw, 32px)', height: 7, background: 'rgba(255,255,255,0.18)', borderRadius: 4 }} />
+                  </div>
+                  {/* S.E + GARAGE */}
+                  <div>
+                    <div style={{
+                      fontFamily: "'Exo 2', sans-serif",
+                      fontSize: 'clamp(72px, 13vw, 140px)',
+                      fontWeight: 900,
+                      color: '#e85d22',
+                      lineHeight: 0.82,
+                      letterSpacing: '-3px',
+                      textShadow: '0 0 30px rgba(232,93,34,0.5), 0 4px 16px rgba(0,0,0,0.9)',
+                    }}>S.E</div>
+                    <div style={{
+                      fontFamily: "'Exo 2', sans-serif",
+                      fontSize: 'clamp(14px, 2.2vw, 28px)',
+                      fontWeight: 700,
+                      color: 'white',
+                      letterSpacing: '0.5em',
+                      textTransform: 'uppercase',
+                      marginTop: 10,
+                      textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+                    }}>GARAGE</div>
                   </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <p className="font-display text-5xl text-or leading-none">2009</p>
-                  <p className="font-mono text-xs uppercase tracking-widest text-acier mt-1">
-                    Fondation du garage
-                  </p>
-                </div>
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-forge/60 via-transparent to-transparent" />
+                {/* Trait orange bas */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(to right, #e85d22 0%, transparent 60%)' }} />
               </div>
             </motion.div>
 

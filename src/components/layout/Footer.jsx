@@ -49,10 +49,10 @@ export function Footer() {
           <div>
             <h3 className="font-mono text-xs uppercase tracking-widest text-or mb-6">Nous trouver</h3>
             <div className="space-y-4">
-              <a href="tel:0622133447" className="flex items-center gap-3 group">
+              <a href="tel:0141114340" className="flex items-center gap-3 group">
                 <Phone size={16} className="text-or flex-shrink-0" />
                 <span className="font-display text-xl tracking-wider text-calcaire group-hover:text-or transition-colors duration-200">
-                  06 22 13 34 47
+                  01 41 11 43 40
                 </span>
               </a>
               <div className="flex items-start gap-3">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
 import { SectionLabel } from '../ui/SectionLabel'
@@ -20,9 +20,49 @@ function StarRating({ rating }) {
 
 export function Testimonials() {
   const [current, setCurrent] = useState(0)
+  const resumeTimer = useRef(null)
+  const autoTimer = useRef(null)
+  const isPausedRef = useRef(false)
 
-  const prev = () => setCurrent(c => (c - 1 + testimonials.length) % testimonials.length)
-  const next = () => setCurrent(c => (c + 1) % testimonials.length)
+  const startAuto = useCallback(() => {
+    clearInterval(autoTimer.current)
+    autoTimer.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setCurrent(c => (c + 1) % testimonials.length)
+      }
+    }, 4000)
+  }, [])
+
+  const pauseAndResume = useCallback(() => {
+    isPausedRef.current = true
+    clearTimeout(resumeTimer.current)
+    resumeTimer.current = setTimeout(() => {
+      isPausedRef.current = false
+    }, 8000)
+  }, [])
+
+  useEffect(() => {
+    startAuto()
+    return () => {
+      clearInterval(autoTimer.current)
+      clearTimeout(resumeTimer.current)
+    }
+  }, [startAuto])
+
+  const prev = () => {
+    pauseAndResume()
+    setCurrent(c => (c - 1 + testimonials.length) % testimonials.length)
+  }
+
+  const next = () => {
+    pauseAndResume()
+    setCurrent(c => (c + 1) % testimonials.length)
+  }
+
+  const goTo = (i) => {
+    pauseAndResume()
+    setCurrent(i)
+  }
 
   // Show 3 on desktop, 1 on mobile
   const visible = [
@@ -121,7 +161,7 @@ export function Testimonials() {
           {testimonials.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrent(i)}
+              onClick={() => goTo(i)}
               className={`h-px transition-all duration-300 ${
                 i === current % testimonials.length ? 'w-8 bg-anthracite' : 'w-4 bg-acier/40'
               }`}

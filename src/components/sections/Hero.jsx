@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowDown } from 'lucide-react'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
+import { useGarageStatus } from '../../hooks/useGarageStatus'
 
 const containerVariants = {
   hidden: {},
@@ -17,6 +18,8 @@ const itemVariants = {
 }
 
 export function Hero() {
+  const { isOpen, label } = useGarageStatus()
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-forge">
       {/* Real garage photo as background */}
@@ -32,17 +35,17 @@ export function Hero() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-forge to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-24 pb-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-24 pb-32 lg:pb-24">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="max-w-3xl"
         >
-          {/* Badge */}
+          {/* Badge statut dynamique */}
           <motion.div variants={itemVariants} className="mb-8">
-            <Badge variant="success" pulse>
-              Ouvert aujourd'hui
+            <Badge variant={isOpen ? 'success' : 'alerte'} pulse={isOpen}>
+              {label}
             </Badge>
           </motion.div>
 
@@ -79,9 +82,9 @@ export function Hero() {
             <Link to="/rendez-vous">
               <Button size="lg">Prendre rendez-vous</Button>
             </Link>
-            <a href="tel:0622133447">
+            <a href="tel:0141114340">
               <Button variant="ghost" size="lg">
-                06 22 13 34 47
+                01 41 11 43 40
               </Button>
             </a>
           </motion.div>

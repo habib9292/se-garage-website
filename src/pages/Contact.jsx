@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MapPin, Clock, Phone, Mail, CheckCircle } from 'lucide-react'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { Button } from '../components/ui/Button'
+import { useGarageStatus } from '../hooks/useGarageStatus'
 
 const schema = z.object({
   nom:           z.string().min(2, 'Le nom est requis'),
@@ -26,18 +27,9 @@ const horaires = [
   { jour: 'Dimanche', heure: 'Fermé' },
 ]
 
-function isOpenNow() {
-  const now = new Date()
-  const day = now.getDay()
-  const hour = now.getHours()
-  if (day === 0) return false
-  if (day === 6) return hour >= 9 && hour < 17
-  return hour >= 8 && hour < 19
-}
-
 export function Contact() {
   const [submitted, setSubmitted] = useState(false)
-  const open = isOpenNow()
+  const { isOpen: open } = useGarageStatus()
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
@@ -182,13 +174,13 @@ export function Contact() {
               <div>
                 <h3 className="font-mono text-xs uppercase tracking-widest text-or mb-6">Informations pratiques</h3>
                 <div className="space-y-6">
-                  <a href="tel:0622133447" className="flex items-center gap-4 group">
+                  <a href="tel:0141114340" className="flex items-center gap-4 group">
                     <div className="w-10 h-10 border border-or/30 flex items-center justify-center flex-shrink-0 group-hover:bg-or group-hover:border-or transition-all duration-200">
                       <Phone size={18} className="text-or group-hover:text-anthracite transition-colors duration-200" />
                     </div>
                     <div>
                       <p className="font-mono text-xs uppercase tracking-widest text-acier mb-0.5">Téléphone</p>
-                      <p className="font-display text-2xl text-calcaire tracking-wider group-hover:text-or transition-colors">06 22 13 34 47</p>
+                      <p className="font-display text-2xl text-calcaire tracking-wider group-hover:text-or transition-colors">01 41 11 43 40</p>
                     </div>
                   </a>
 
