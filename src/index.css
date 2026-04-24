@@ -98,6 +98,16 @@ a, button, [role="button"] {
   cursor: none;
 }
 
+/* GPU acceleration pour les sections animées */
+section {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+img {
+  will-change: auto;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

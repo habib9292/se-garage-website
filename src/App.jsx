@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import Lenis from 'lenis'
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
 import { Home } from './pages/Home'
@@ -160,7 +161,33 @@ function PublicSite() {
   )
 }
 
+function useLenis() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 0.6,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      smoothWheel: true,
+      wheelMultiplier: 1.2,
+      touchMultiplier: 1.8,
+      infinite: false,
+    })
+
+    let rafId
+    function raf(time) {
+      lenis.raf(time)
+      rafId = requestAnimationFrame(raf)
+    }
+    rafId = requestAnimationFrame(raf)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis.destroy()
+    }
+  }, [])
+}
+
 export default function App() {
+  useLenis()
   return (
     <>
       <CustomCursor />

@@ -95,7 +95,7 @@ export function Hero() {
             className="flex flex-wrap gap-8 pt-8 border-t border-acier/20"
           >
             {[
-              { value: '69€',    label: 'Vidange + filtre' },
+              { value: '79€',    label: 'Vidange + filtre' },
               { value: '79€',    label: 'Plaquettes AV' },
               { value: '40€',    label: 'Nettoyage complet' },
               { value: '80€/h',  label: 'Taux horaire' },

@@ -4,7 +4,7 @@ export const services = [
   {
     id: 'carrosserie',
     icon: IconCarrosserie,
-    image: 'https://images.unsplash.com/photo-1767681092416-bccf9410bda4?w=900&q=85&auto=format&fit=crop',
+    image: 'https://plus.unsplash.com/premium_photo-1661326333361-ab00d4853e38?w=900&q=85&auto=format&fit=crop',
     title: 'Carrosserie',
     shortDesc: 'Réparation, débosselage, retouche peinture — résultat invisible garanti.',
     description: [
