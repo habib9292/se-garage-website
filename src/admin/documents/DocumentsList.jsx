@@ -7,6 +7,12 @@ function fmt(n) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n || 0)
 }
 
+function fmtDate(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
 const STATUTS = {
   devis:   ['brouillon', 'envoye', 'accepte', 'refuse'],
   facture: ['brouillon', 'envoye', 'paye', 'en_retard'],
@@ -197,7 +203,7 @@ export function DocumentsList({ type }) {
                     {doc.numero}
                   </Link>
                   <span className="font-body text-sm text-calcaire truncate min-w-0">{doc.clientName}</span>
-                  <span className="font-mono text-xs text-acier hidden lg:block">{doc.date_emission}</span>
+                  <span className="font-mono text-xs text-acier hidden lg:block">{fmtDate(doc.date_emission)}</span>
                   <span className="hidden lg:block">
                     <StatutSelect type={type} statut={doc.statut} onChange={s => handleStatutChange(doc.id, s)} />
                   </span>

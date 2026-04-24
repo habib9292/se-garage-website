@@ -702,9 +702,9 @@ function PrintDocument({ doc, lignes, totaux, client }) {
             </div>
             <div style={{ height: '1.5pt', background: accent, marginTop: '5pt', marginBottom: '6pt', width: '50%', marginLeft: 'auto' }} />
             <div style={{ fontSize: '9pt', color: '#444', lineHeight: 1.9 }}>
-              Émission : <strong>{doc.date_emission}</strong><br />
-              {isDevis && doc.date_validite && <>Validité : <strong>{doc.date_validite}</strong><br /></>}
-              {!isDevis && doc.date_echeance && <>Échéance : <strong style={{ color: accent }}>{doc.date_echeance}</strong></>}
+              Émission : <strong>{doc.date_emission?.split('-').reverse().join('/')}</strong><br />
+              {isDevis && doc.date_validite && <>Validité : <strong>{doc.date_validite?.split('-').reverse().join('/')}</strong><br /></>}
+              {!isDevis && doc.date_echeance && <>Échéance : <strong style={{ color: accent }}>{doc.date_echeance?.split('-').reverse().join('/')}</strong></>}
             </div>
           </div>
         </div>

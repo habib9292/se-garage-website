@@ -153,7 +153,7 @@ export function Dashboard() {
                     </span>
                     <div className="min-w-0">
                       <p className="font-body text-sm text-calcaire truncate">{doc.numero}</p>
-                      <p className="font-body text-xs text-acier truncate">{doc.clientName} · {doc.date_emission}</p>
+                      <p className="font-body text-xs text-acier truncate">{doc.clientName} · {doc.date_emission ? doc.date_emission.split('-').reverse().join('/') : ''}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center justify-end gap-2 flex-shrink-0">
