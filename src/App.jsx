@@ -164,11 +164,11 @@ function PublicSite() {
 function useLenis() {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 0.6,
+      duration: 0.9,
       easing: (t) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
-      wheelMultiplier: 1.2,
-      touchMultiplier: 1.8,
+      wheelMultiplier: 0.7,
+      touchMultiplier: 1.2,
       infinite: false,
     })
 
