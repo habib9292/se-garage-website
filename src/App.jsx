@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Lenis from 'lenis'
@@ -141,7 +141,16 @@ function AdminGuard({ children }) {
 
 function PublicSite() {
   const location = useLocation()
-  useLenis()
+  const lenisRef = useLenis()
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+  }, [location.pathname])
+
   return (
     <>
       <Navbar />
@@ -163,6 +172,8 @@ function PublicSite() {
 }
 
 function useLenis() {
+  const lenisRef = useRef(null)
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 0.9,
@@ -172,6 +183,7 @@ function useLenis() {
       touchMultiplier: 1.2,
       infinite: false,
     })
+    lenisRef.current = lenis
 
     let rafId
     function raf(time) {
@@ -183,15 +195,17 @@ function useLenis() {
     return () => {
       cancelAnimationFrame(rafId)
       lenis.destroy()
+      lenisRef.current = null
     }
   }, [])
+
+  return lenisRef
 }
 
 export default function App() {
   return (
     <>
       <CustomCursor />
-      <ScrollToTop />
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
