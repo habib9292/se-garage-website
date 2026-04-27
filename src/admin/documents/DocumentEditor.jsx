@@ -140,8 +140,8 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
   const computedTtc = (Math.round(((ligne.prix_unitaire_ht || 0) * multiplier + Number.EPSILON) * 100) / 100).toFixed(2)
 
   function handleHtChange(e) {
-    const v = parseFloat(e.target.value) || 0
-    update('prix_unitaire_ht', Math.round(v * 100) / 100)
+    // Saisie manuelle HT : on garde 2 décimales (utilisateur tape ce qu'il veut)
+    update('prix_unitaire_ht', parseFloat(e.target.value) || 0)
   }
 
   function handleTtcFocus() {
@@ -152,7 +152,9 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
   function handleTtcChange(e) {
     const raw = e.target.value
     setTtcDraft(raw)
-    const ht = Math.round(((parseFloat(raw) || 0) / multiplier) * 100) / 100
+    // Stocker HT avec 4 décimales pour éviter la perte de précision sur plusieurs lignes
+    // Ex : TTC=25 → HT=20.8333 (pas 20.83) → 2 lignes = 41.6666 → total HT = 41.67 ✓
+    const ht = Math.round(((parseFloat(raw) || 0) / multiplier) * 10000) / 10000
     update('prix_unitaire_ht', ht)
   }
 
