@@ -69,6 +69,8 @@ function getClientName(doc, clientMap) {
   return doc.client_nom_libre || '—'
 }
 
+const ALL_STATUTS = ['brouillon', 'envoye', 'accepte', 'refuse', 'paye', 'en_retard', 'avoir_emis']
+
 export function DocumentsList({ type }) {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
@@ -77,14 +79,19 @@ export function DocumentsList({ type }) {
   const [allDocs, setAllDocs] = useState([])
   const [clientMap, setClientMap] = useState({})
 
+  const isAll   = type === 'all'
   const isDevis = type === 'devis'
   const isAvoir = type === 'avoir'
   const createPath = isDevis ? '/admin/devis/nouveau' : isAvoir ? '/admin/avoirs/nouveau' : '/admin/factures/nouvelle'
-  const editPath = (id) => isDevis ? `/admin/devis/${id}` : isAvoir ? `/admin/avoirs/${id}` : `/admin/factures/${id}`
+
+  function editPath(doc) {
+    const t = isAll ? doc.type : type
+    return t === 'devis' ? `/admin/devis/${doc.id}` : t === 'avoir' ? `/admin/avoirs/${doc.id}` : `/admin/factures/${doc.id}`
+  }
 
   async function load() {
     const [docs, allClients] = await Promise.all([
-      documents.byType(type),
+      isAll ? documents.all() : documents.byType(type),
       clients.all(),
     ])
     setAllDocs(docs)
@@ -126,7 +133,9 @@ export function DocumentsList({ type }) {
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-or mb-1">Documents</p>
           <h1 className="font-display text-calcaire uppercase flex items-center gap-3" style={{ fontSize: '36px' }}>
-            {isDevis
+            {isAll
+              ? <><FileText size={22} className="text-or" /> Tous les documents</>
+              : isDevis
               ? <><FileText size={22} className="text-or" /> Devis</>
               : isAvoir
               ? <><FileMinus size={22} className="text-or" /> Avoirs</>
@@ -134,7 +143,7 @@ export function DocumentsList({ type }) {
             }
           </h1>
         </div>
-        {isAvoir ? (
+        {isAll ? null : isAvoir ? (
           <p className="font-mono text-xs text-acier">Créés depuis une facture</p>
         ) : (
           <Link to={createPath}
@@ -167,7 +176,7 @@ export function DocumentsList({ type }) {
             className="pl-9 pr-6 py-2 bg-anthracite border border-acier/20 text-calcaire font-body text-sm outline-none focus:border-or/50 appearance-none cursor-pointer"
           >
             <option value="">Tous statuts</option>
-            {STATUTS[type].map(s => <option key={s} value={s}>{STATUT_LABELS[s]}</option>)}
+            {(isAll ? ALL_STATUTS : STATUTS[type]).map(s => <option key={s} value={s}>{STATUT_LABELS[s]}</option>)}
           </select>
         </div>
       </div>
@@ -199,19 +208,24 @@ export function DocumentsList({ type }) {
             <div className="divide-y divide-acier/5">
               {items.map(doc => (
                 <div key={doc.id} className="group grid grid-cols-[160px_1fr_100px_160px_110px_56px] gap-4 items-center px-6 py-3.5 hover:bg-acier/5 transition-colors">
-                  <Link to={editPath(doc.id)} className="font-mono text-sm text-or hover:underline whitespace-nowrap">
+                  <Link to={editPath(doc)} className="font-mono text-sm text-or hover:underline whitespace-nowrap flex items-center gap-2">
+                    {isAll && (
+                      <span className={`text-[10px] px-1.5 py-0.5 font-mono ${doc.type === 'devis' ? 'bg-or/10 text-or' : doc.type === 'avoir' ? 'bg-alerte/10 text-alerte' : 'bg-acier/10 text-calcaire'}`}>
+                        {doc.type === 'devis' ? 'DEV' : doc.type === 'avoir' ? 'AV' : 'FAC'}
+                      </span>
+                    )}
                     {doc.numero}
                   </Link>
                   <span className="font-body text-sm text-calcaire truncate min-w-0">{doc.clientName}</span>
                   <span className="font-mono text-xs text-acier hidden lg:block">{fmtDate(doc.date_emission)}</span>
                   <span className="hidden lg:block">
-                    <StatutSelect type={type} statut={doc.statut} onChange={s => handleStatutChange(doc.id, s)} />
+                    <StatutSelect type={isAll ? doc.type : type} statut={doc.statut} onChange={s => handleStatutChange(doc.id, s)} />
                   </span>
                   <span className="font-display text-or whitespace-nowrap text-right" style={{ fontSize: '18px' }}>
                     {fmt(doc.totaux.totalTTC)}
                   </span>
                   <div className="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link to={editPath(doc.id)} className="p-1 text-acier hover:text-or transition-colors" title="Ouvrir">
+                      <Link to={editPath(doc)} className="p-1 text-acier hover:text-or transition-colors" title="Ouvrir">
                         <Eye size={14} />
                       </Link>
                       <button onClick={() => setDeleteConfirm(doc.id)} className="p-1 text-acier hover:text-alerte transition-colors" title="Supprimer">

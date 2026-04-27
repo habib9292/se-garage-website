@@ -204,6 +204,7 @@ export default function App() {
         >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard"    element={<Dashboard />} />
+          <Route path="documents"    element={<DocumentsList type="all" />} />
           <Route path="devis"        element={<DocumentsList type="devis" />} />
           <Route path="devis/:id"    element={<DocumentEditor type="devis" />} />
           <Route path="factures"     element={<DocumentsList type="facture" />} />

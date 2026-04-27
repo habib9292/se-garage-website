@@ -125,7 +125,7 @@ export function Dashboard() {
       <div className="bg-anthracite border border-acier/10">
         <div className="flex items-center justify-between px-6 py-4 border-b border-acier/10">
           <p className="font-mono text-xs uppercase tracking-widest text-or">Documents récents</p>
-          <Link to="/admin/devis" className="font-mono text-xs text-acier hover:text-calcaire flex items-center gap-1 transition-colors">
+          <Link to="/admin/documents" className="font-mono text-xs text-acier hover:text-calcaire flex items-center gap-1 transition-colors">
             Tout voir <ArrowRight size={12} />
           </Link>
         </div>
