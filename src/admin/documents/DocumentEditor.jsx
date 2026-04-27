@@ -140,7 +140,8 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
   const computedTtc = ((ligne.prix_unitaire_ht || 0) * multiplier).toFixed(2)
 
   function handleHtChange(e) {
-    update('prix_unitaire_ht', parseFloat(e.target.value) || 0)
+    const v = parseFloat(e.target.value) || 0
+    update('prix_unitaire_ht', Math.round(v * 100) / 100)
   }
 
   function handleTtcFocus() {
@@ -151,7 +152,7 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
   function handleTtcChange(e) {
     const raw = e.target.value
     setTtcDraft(raw)
-    const ht = parseFloat((( parseFloat(raw) || 0) / multiplier).toFixed(6))
+    const ht = Math.round(((parseFloat(raw) || 0) / multiplier) * 100) / 100
     update('prix_unitaire_ht', ht)
   }
 
@@ -190,7 +191,7 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
         />
       </td>
       <td className="px-2 py-2 w-28">
-        <input type="number" value={ligne.prix_unitaire_ht || ''}
+        <input type="number" value={ligne.prix_unitaire_ht ? Math.round(ligne.prix_unitaire_ht * 100) / 100 : ''}
           onChange={handleHtChange}
           min="0" step="0.01" placeholder="0.00"
           className="w-full bg-transparent text-sm text-calcaire text-right font-body px-1 py-1.5 border border-transparent hover:border-acier/20 focus:border-or/50 outline-none placeholder-acier/30"
