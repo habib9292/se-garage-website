@@ -137,7 +137,7 @@ function LigneRow({ ligne, index, onUpdate, onDelete, cat, tvaTaux, tvaApplicabl
 
   function update(field, val) { onUpdate(index, { ...ligne, [field]: val }) }
 
-  const computedTtc = ((ligne.prix_unitaire_ht || 0) * multiplier).toFixed(2)
+  const computedTtc = (Math.round(((ligne.prix_unitaire_ht || 0) * multiplier + Number.EPSILON) * 100) / 100).toFixed(2)
 
   function handleHtChange(e) {
     const v = parseFloat(e.target.value) || 0

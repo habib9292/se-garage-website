@@ -14,22 +14,24 @@ function plusDays(n) {
 }
 
 // ── calculs (sync, inchangés) ─────────────────────────────
+const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100
+
 export function calculer(lignes = [], remiseGlobale = 0, tvaApplicable = true, tvaTaux = 20) {
-  const totalHTBrut = lignes.reduce((s, l) => {
+  const totalHTBrut = r2(lignes.reduce((s, l) => {
     const base = parseFloat(l.quantite || 1) * parseFloat(l.prix_unitaire_ht || 0)
     const remise = base * (parseFloat(l.remise_ligne || 0) / 100)
-    return s + base - remise
-  }, 0)
-  const montantRemise = totalHTBrut * (remiseGlobale / 100)
-  const totalHT = totalHTBrut - montantRemise
-  const montantTVA = tvaApplicable ? totalHT * (tvaTaux / 100) : 0
-  const totalTTC = totalHT + montantTVA
+    return s + r2(base - remise)
+  }, 0))
+  const montantRemise = r2(totalHTBrut * (remiseGlobale / 100))
+  const totalHT = r2(totalHTBrut - montantRemise)
+  const montantTVA = tvaApplicable ? r2(totalHT * (tvaTaux / 100)) : 0
+  const totalTTC = r2(totalHT + montantTVA)
   return { totalHTBrut, montantRemise, totalHT, montantTVA, totalTTC }
 }
 
 export function ligneTotal(l) {
   const base = parseFloat(l.quantite || 1) * parseFloat(l.prix_unitaire_ht || 0)
-  return base * (1 - parseFloat(l.remise_ligne || 0) / 100)
+  return r2(base * (1 - parseFloat(l.remise_ligne || 0) / 100))
 }
 
 // ── numérotation ─────────────────────────────────────────
