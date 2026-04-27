@@ -17,6 +17,7 @@ function ServiceCard({ service, index }) {
       whileHover={{ y: -4 }}
       className="group bg-forge border border-acier/10 flex flex-col transition-all duration-200 hover:border-or/50 hover:bg-anthracite overflow-hidden"
     >
+    <Link to={`/services#${service.slug}`} className="flex flex-col flex-1">
       {/* Image */}
       {service.image && (
         <div className="relative h-44 overflow-hidden">
@@ -46,14 +47,12 @@ function ServiceCard({ service, index }) {
         {service.shortDesc}
       </p>
 
-      <Link
-        to={`/services#${service.slug}`}
-        className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-or hover:gap-3 transition-all duration-200"
-      >
+      <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-or group-hover:gap-3 transition-all duration-200">
         En savoir plus
         <ArrowRight size={14} />
-      </Link>
+      </span>
       </div>
+    </Link>
     </motion.div>
   )
 }
