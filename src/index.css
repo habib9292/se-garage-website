@@ -47,8 +47,14 @@
   }
 }
 
-/* Custom cursor */
-* {
+/* Custom cursor — désactivé dans l'admin */
+body:not(.admin) * {
+  cursor: none;
+}
+
+body:not(.admin) a,
+body:not(.admin) button,
+body:not(.admin) [role="button"] {
   cursor: none;
 }
 
@@ -94,9 +100,6 @@
   border-color: rgba(10, 10, 10, 0.9);
 }
 
-a, button, [role="button"] {
-  cursor: none;
-}
 
 /* GPU acceleration pour les sections animées */
 section {

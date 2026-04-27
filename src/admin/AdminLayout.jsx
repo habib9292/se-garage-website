@@ -25,7 +25,7 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-forge overflow-hidden">
+    <div className="flex h-screen bg-forge overflow-hidden" style={{ cursor: 'default' }}>
       {/* Sidebar overlay mobile */}
       {open && (
         <div

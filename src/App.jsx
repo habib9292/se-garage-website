@@ -202,9 +202,22 @@ function useLenis() {
   return lenisRef
 }
 
+function AdminBodyClass() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (pathname.startsWith('/admin')) {
+      document.body.classList.add('admin')
+    } else {
+      document.body.classList.remove('admin')
+    }
+  }, [pathname])
+  return null
+}
+
 export default function App() {
   return (
     <>
+      <AdminBodyClass />
       <CustomCursor />
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
