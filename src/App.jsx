@@ -141,6 +141,7 @@ function AdminGuard({ children }) {
 
 function PublicSite() {
   const location = useLocation()
+  useLenis()
   return (
     <>
       <Navbar />
@@ -187,7 +188,6 @@ function useLenis() {
 }
 
 export default function App() {
-  useLenis()
   return (
     <>
       <CustomCursor />
