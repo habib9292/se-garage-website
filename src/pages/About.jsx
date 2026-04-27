@@ -8,7 +8,6 @@ const timeline = [
   { year: 'À venir', event: "Extension de l'atelier", desc: "Agrandissement de l'atelier pour accueillir plus de véhicules et intégrer de nouveaux équipements de diagnostic." },
 ]
 
-const certifications = ['Contrôle Technique Homologué', 'Agréé Assurances', 'Certification Hybrid & EV', 'Partenaire Michelin', 'Agréé Castrol', 'Membre FFC']
 
 function TimelineItem({ item, index }) {
   const { ref, isVisible } = useScrollReveal()
@@ -93,32 +92,6 @@ export function About() {
         </div>
       </section>
 
-      {/* Certifications */}
-      <section className="bg-forge py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <SectionLabel>Certifications & Agréments</SectionLabel>
-          <h2 className="font-display text-calcaire uppercase leading-none mb-12" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
-            Reconnus et certifiés
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-acier/10">
-            {certifications.map((cert, i) => (
-              <motion.div
-                key={cert}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="bg-anthracite p-6 text-center hover:bg-forge transition-colors duration-200"
-              >
-                <div className="w-8 h-8 border border-or/30 mx-auto mb-3 flex items-center justify-center">
-                  <div className="w-3 h-3 bg-or/60" />
-                </div>
-                <p className="font-mono text-xs uppercase tracking-wider text-acier leading-tight">{cert}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   )
 }
