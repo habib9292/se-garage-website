@@ -17,15 +17,28 @@ function plusDays(n) {
 const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100
 
 export function calculer(lignes = [], remiseGlobale = 0, tvaApplicable = true, tvaTaux = 20) {
-  const totalHTBrut = r2(lignes.reduce((s, l) => {
+  const multiplier = tvaApplicable ? (1 + (tvaTaux || 20) / 100) : 1
+
+  // 1. Sommer les TTC par ligne (chacun arrondi à 2 décimales)
+  //    → évite la perte de précision accumulée via HT
+  const totalTTCBrut = r2(lignes.reduce((s, l) => {
     const base = parseFloat(l.quantite || 1) * parseFloat(l.prix_unitaire_ht || 0)
-    const remise = base * (parseFloat(l.remise_ligne || 0) / 100)
-    return s + r2(base - remise)
+    const apresRemiseLigne = r2(base * (1 - parseFloat(l.remise_ligne || 0) / 100))
+    return s + r2(apresRemiseLigne * multiplier)
   }, 0))
-  const montantRemise = r2(totalHTBrut * (remiseGlobale / 100))
-  const totalHT = r2(totalHTBrut - montantRemise)
-  const montantTVA = tvaApplicable ? r2(totalHT * (tvaTaux / 100)) : 0
-  const totalTTC = r2(totalHT + montantTVA)
+
+  // 2. Appliquer la remise globale sur le TTC
+  const remiseTTC = r2(totalTTCBrut * (remiseGlobale / 100))
+  const totalTTC = r2(totalTTCBrut - remiseTTC)
+
+  // 3. Déduire HT et TVA depuis le TTC total
+  const totalHT = r2(totalTTC / multiplier)
+  const montantTVA = r2(totalTTC - totalHT)
+
+  // Pour l'affichage du HT brut et remise en HT
+  const totalHTBrut = r2(totalTTCBrut / multiplier)
+  const montantRemise = r2(totalHTBrut - totalHT)
+
   return { totalHTBrut, montantRemise, totalHT, montantTVA, totalTTC }
 }
 
@@ -116,15 +129,18 @@ export const documents = {
   async create(doc, lignesData = []) {
     // N'appeler nextNumero que si le numéro n'est pas déjà défini
     const numero = doc.numero || await nextNumero(doc.type || 'devis')
+    const docType = doc.type || 'devis'
+    const cleanedDoc = cleanDoc(doc)
     const { data: newDoc, error } = await supabase.from('seg_documents').insert({
       type: 'devis',
-      statut: 'brouillon',
       remise_globale: 0,
       tva_taux: 20,
       tva_applicable: true,
       conditions_paiement: 'Paiement à 30 jours',
       moyens_paiement: 'Virement, espèces, chèque, CB',
-      ...cleanDoc(doc),
+      ...cleanedDoc,
+      // Le statut forcé vient en dernier pour ne pas être écrasé
+      statut: docType === 'devis' ? 'envoye' : (cleanedDoc.statut || 'brouillon'),
       numero,
     }).select().single()
     if (error) throw error

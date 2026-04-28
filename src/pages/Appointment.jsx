@@ -9,11 +9,14 @@ import { services } from '../data/services'
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 const step3Schema = z.object({
-  nom:          z.string().min(2, 'Nom requis'),
-  telephone:    z.string().min(10, 'Téléphone invalide'),
-  email:        z.string().email('Email invalide'),
-  marque:       z.string().min(2, 'Marque & modèle requis'),
+  nom:          z.string({ required_error: 'Nom requis' }).min(2, 'Nom requis'),
+  telephone:    z.string({ required_error: 'Téléphone requis' }).min(10, 'Numéro invalide (10 chiffres minimum)'),
+  email:        z.string({ required_error: 'Email requis' }).min(1, 'Email requis').email('Adresse email invalide'),
+  marque:       z.string({ required_error: 'Marque & modèle requis' }).min(2, 'Marque & modèle requis'),
   kilometrage:  z.string().optional(),
+  immatriculation: z.string({ required_error: 'Immatriculation requise' })
+    .min(1, 'Immatriculation requise')
+    .regex(/^[A-Za-z]{2}-?[0-9]{3}-?[A-Za-z]{2}$/, 'Format invalide — exemple : AB-123-CD'),
 })
 
 // Créneaux toutes les 30 minutes (matin + après-midi)
@@ -347,7 +350,7 @@ function Step3({ register, errors }) {
         </div>
         <div>
           <label className="block font-mono text-xs uppercase tracking-widest text-acier mb-2">
-            Kilométrage <span className="text-acier/40 normal-case">(optionnel)</span>
+            Kilométrage <span className="text-acier/40 normal-case tracking-normal">(optionnel)</span>
           </label>
           <input
             {...register('kilometrage')}
@@ -356,6 +359,19 @@ function Step3({ register, errors }) {
             className="w-full bg-forge border border-acier/20 px-4 py-3 font-body text-sm text-calcaire placeholder-acier/50 outline-none transition-colors focus:border-or"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block font-mono text-xs uppercase tracking-widest text-acier mb-2">
+          Plaque d'immatriculation *
+        </label>
+        <input
+          {...register('immatriculation')}
+          placeholder="Ex : AB-123-CD"
+          className={`w-full bg-forge border px-4 py-3 font-body text-sm text-calcaire placeholder-acier/50 outline-none transition-colors focus:border-or ${errors.immatriculation ? 'border-alerte' : 'border-acier/20'}`}
+          style={{ textTransform: 'uppercase' }}
+        />
+        {errors.immatriculation && <p className="text-alerte text-xs mt-1">{errors.immatriculation.message}</p>}
       </div>
     </motion.div>
   )
@@ -368,9 +384,12 @@ export function Appointment() {
   const [selectedDate, setSelectedDate]       = useState(null)
   const [selectedSlot, setSelectedSlot]       = useState(null)
   const [submitted, setSubmitted]             = useState(false)
+  const [triedSubmit, setTriedSubmit]         = useState(false)
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(step3Schema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
 
   const goNext = () => {
@@ -391,9 +410,10 @@ export function Appointment() {
         nom:         data.nom,
         telephone:   data.telephone,
         email:       data.email,
-        marque:      data.marque,
-        kilometrage: data.kilometrage || '',
-        service:     serviceName,
+        marque:          data.marque,
+        kilometrage:     data.kilometrage || '',
+        immatriculation: data.immatriculation || '',
+        service:         serviceName,
       }),
     }).catch(() => {})
 
@@ -475,7 +495,7 @@ export function Appointment() {
         <div className="max-w-2xl mx-auto px-6 lg:px-8">
           <ProgressBar step={step} />
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <Step1
@@ -494,7 +514,7 @@ export function Appointment() {
                 />
               )}
               {step === 3 && (
-                <Step3 key="step3" register={register} errors={errors} />
+                <Step3 key="step3" register={register} errors={triedSubmit ? errors : {}} />
               )}
             </AnimatePresence>
 
@@ -524,7 +544,7 @@ export function Appointment() {
                   <ChevronRight size={16} className="ml-2" />
                 </Button>
               ) : (
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} onClick={() => setTriedSubmit(true)}>
                   {isSubmitting ? 'Enregistrement...' : 'Confirmer le RDV'}
                   {!isSubmitting && <CheckCircle size={16} className="ml-2" />}
                 </Button>

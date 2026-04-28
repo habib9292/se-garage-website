@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
 
-  const { date, slot, nom, telephone, email, marque, service, kilometrage } = req.body
+  const { date, slot, nom, telephone, email, marque, service, kilometrage, immatriculation } = req.body
 
   if (!date || !slot || !nom) {
     return res.status(400).json({ error: 'Données manquantes' })
@@ -70,6 +70,7 @@ export default async function handler(req, res) {
           `📧 ${email}`,
           `🚗 ${marque}`,
           `🔧 ${service}`,
+          immatriculation ? `🔑 ${immatriculation}` : '',
           kilometrage ? `📏 ${kilometrage} km` : '',
         ].filter(Boolean).join('\n'),
         start: { dateTime: startDateTime, timeZone: 'Europe/Paris' },
@@ -119,7 +120,11 @@ export default async function handler(req, res) {
                 <td style="padding: 10px 16px; font-weight: bold; color: #6B7280;">Service</td>
                 <td style="padding: 10px 16px; color: #1A1A1A;">${service}</td>
               </tr>
-              ${kilometrage ? `<tr style="background: #f5f3ef;">
+              ${immatriculation ? `<tr style="background: #f5f3ef;">
+                <td style="padding: 10px 16px; font-weight: bold; color: #6B7280;">Immatriculation</td>
+                <td style="padding: 10px 16px; color: #1A1A1A;">${immatriculation}</td>
+              </tr>` : ''}
+              ${kilometrage ? `<tr style="background: #fff;">
                 <td style="padding: 10px 16px; font-weight: bold; color: #6B7280;">Kilométrage</td>
                 <td style="padding: 10px 16px; color: #1A1A1A;">${kilometrage} km</td>
               </tr>` : ''}

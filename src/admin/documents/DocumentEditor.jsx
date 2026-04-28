@@ -267,7 +267,7 @@ export function DocumentEditor({ type }) {
   const [doc, setDoc] = useState({
     type,
     numero: '',
-    statut: 'brouillon',
+    statut: type === 'devis' ? 'envoye' : 'brouillon',
     client_id: '',
     client_nom_libre: '',
     date_emission: new Date().toISOString().split('T')[0],
