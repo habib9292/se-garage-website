@@ -36,8 +36,12 @@ export function Contact() {
   })
 
   const onSubmit = async (data) => {
-    await new Promise(r => setTimeout(r, 1200))
-    console.log('Form data:', data)
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) throw new Error('Erreur envoi')
     setSubmitted(true)
   }
 

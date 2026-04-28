@@ -1,4 +1,17 @@
 {
+  "functions": {
+    "api/book.js":      { "maxDuration": 30 },
+    "api/cancel.js":    { "maxDuration": 20 },
+    "api/reminder.js":  { "maxDuration": 30 },
+    "api/availability.js": { "maxDuration": 15 },
+    "api/contact.js":     { "maxDuration": 20 }
+  },
+  "crons": [
+    {
+      "path": "/api/reminder",
+      "schedule": "0 8 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

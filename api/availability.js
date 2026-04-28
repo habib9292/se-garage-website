@@ -1,6 +1,9 @@
 import { google } from 'googleapis'
 
-const SLOTS = ['8h00', '9h00', '10h00', '11h00', '14h00', '15h00', '16h00', '17h00']
+const SLOTS = [
+  '8h00','8h30','9h00','9h30','10h00','10h30','11h00','11h30',
+  '14h00','14h30','15h00','15h30','16h00','16h30','17h00','17h30',
+]
 
 function slotToMinutes(slot) {
   const [h, m] = slot.replace('h', ':').split(':').map(Number)
@@ -57,7 +60,7 @@ export default async function handler(req, res) {
     // Compare en heure Paris grâce à Intl.DateTimeFormat
     const takenSlots = SLOTS.filter(slot => {
       const slotStart = slotToMinutes(slot)
-      const slotEnd   = slotStart + 60
+      const slotEnd   = slotStart + 30
 
       return busyPeriods.some(period => {
         const bStart = toParisMinutes(period.start)

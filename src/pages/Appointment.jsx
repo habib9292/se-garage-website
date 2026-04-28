@@ -9,13 +9,41 @@ import { services } from '../data/services'
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 const step3Schema = z.object({
-  nom:       z.string().min(2, 'Nom requis'),
-  telephone: z.string().min(10, 'Téléphone invalide'),
-  email:     z.string().email('Email invalide'),
-  marque:    z.string().min(2, 'Marque & modèle requis'),
+  nom:          z.string().min(2, 'Nom requis'),
+  telephone:    z.string().min(10, 'Téléphone invalide'),
+  email:        z.string().email('Email invalide'),
+  marque:       z.string().min(2, 'Marque & modèle requis'),
+  kilometrage:  z.string().optional(),
 })
 
-const ALL_SLOTS = ['8h00', '9h00', '10h00', '11h00', '14h00', '15h00', '16h00', '17h00']
+// Créneaux toutes les 30 minutes (matin + après-midi)
+const ALL_SLOTS = [
+  '8h00','8h30','9h00','9h30','10h00','10h30','11h00','11h30',
+  '14h00','14h30','15h00','15h30','16h00','16h30','17h00','17h30',
+]
+
+const dayNames   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+const monthNames = ['jan', 'fév', 'mar', 'avr', 'mai', 'jui', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc']
+
+const localDateKey = (d) => {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+// Génère les 30 prochains jours (hors dimanche)
+function buildDays() {
+  const days = []
+  let i = 1
+  while (days.length < 30) {
+    const d = new Date()
+    d.setDate(d.getDate() + i)
+    if (d.getDay() !== 0) days.push(d)
+    i++
+  }
+  return days
+}
 
 // ─── Progress Bar ────────────────────────────────────────────────────────────
 function ProgressBar({ step }) {
@@ -91,30 +119,17 @@ function Step1({ selectedService, onSelect }) {
   )
 }
 
-// ─── Step 2 : Créneau (design original + vraie dispo) ────────────────────────
+// ─── Step 2 : Créneau (30 jours + créneaux 30min) ───────────────────────────
 function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
   const [takenSlots, setTakenSlots] = useState([])
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [weekOffset, setWeekOffset] = useState(0)
 
-  const days = []
-  for (let i = 0; i < 7; i++) {
-    const d = new Date()
-    d.setDate(d.getDate() + i + 1)
-    if (d.getDay() !== 0) days.push(d) // pas dimanche
-  }
+  const allDays = buildDays()
+  // 7 jours par page
+  const weekDays = allDays.slice(weekOffset * 7, weekOffset * 7 + 7)
+  const totalWeeks = Math.ceil(allDays.length / 7)
 
-  // Génère une clé date locale YYYY-MM-DD (sans décalage UTC)
-  const localDateKey = (d) => {
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
-  }
-
-  const dayNames   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
-  const monthNames = ['jan', 'fév', 'mar', 'avr', 'mai', 'jui', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc']
-
-  // Charge les créneaux pris quand une date est sélectionnée
   useEffect(() => {
     if (!selectedDate) return
     setTakenSlots([])
@@ -126,6 +141,15 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
       .finally(() => setLoadingSlots(false))
   }, [selectedDate])
 
+  const morningSlots = ALL_SLOTS.filter(s => {
+    const h = parseInt(s.split('h')[0])
+    return h < 12
+  })
+  const afternoonSlots = ALL_SLOTS.filter(s => {
+    const h = parseInt(s.split('h')[0])
+    return h >= 14
+  })
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -136,11 +160,32 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
       <h2 className="font-display text-2xl lg:text-3xl text-calcaire uppercase tracking-wide mb-2">
         Choisissez un créneau
       </h2>
-      <p className="font-body text-sm text-acier mb-8">Disponibilités sur les 7 prochains jours</p>
+      <p className="font-body text-sm text-acier mb-6">Disponibilités sur les 30 prochains jours</p>
 
-      {/* Jours */}
+      {/* Navigation semaines */}
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={() => { setWeekOffset(w => Math.max(0, w - 1)); onSelectDate(null); onSelectSlot(null) }}
+          disabled={weekOffset === 0}
+          className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-acier hover:text-or transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft size={14} /> Préc.
+        </button>
+        <span className="font-mono text-xs uppercase tracking-widest text-acier/60">
+          Semaine {weekOffset + 1} / {totalWeeks}
+        </span>
+        <button
+          onClick={() => { setWeekOffset(w => Math.min(totalWeeks - 1, w + 1)); onSelectDate(null); onSelectSlot(null) }}
+          disabled={weekOffset >= totalWeeks - 1}
+          className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-acier hover:text-or transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Suiv. <ChevronRight size={14} />
+        </button>
+      </div>
+
+      {/* Jours de la semaine */}
       <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mb-8">
-        {days.map((day) => {
+        {weekDays.map((day) => {
           const key = localDateKey(day)
           const isSelected = selectedDate === key
           return (
@@ -171,23 +216,44 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
             {loadingSlots && <Loader2 size={12} className="text-or animate-spin" />}
           </div>
 
-          <div className="grid grid-cols-4 gap-2">
-            {ALL_SLOTS.map(slot => {
-              const isTaken    = takenSlots.includes(slot)
+          {/* Matin */}
+          <p className="font-mono text-xs uppercase tracking-widest text-acier/40 mb-2">Matin</p>
+          <div className="grid grid-cols-4 gap-2 mb-5">
+            {morningSlots.map(slot => {
+              const isTaken = takenSlots.includes(slot)
               const isSelected = selectedSlot === slot
+              if (isTaken) return (
+                <div key={slot} className="py-2.5 font-mono text-sm border border-acier/10 text-acier/25 text-center cursor-not-allowed">
+                  <span className="line-through">{slot}</span>
+                </div>
+              )
+              return (
+                <button
+                  key={slot}
+                  onClick={() => onSelectSlot(slot)}
+                  className={`py-2.5 font-mono text-sm border transition-all duration-200 ${
+                    isSelected
+                      ? 'border-or bg-or text-anthracite'
+                      : 'border-acier/20 text-acier hover:border-or/50 hover:text-calcaire'
+                  }`}
+                >
+                  {slot}
+                </button>
+              )
+            })}
+          </div>
 
-              if (isTaken) {
-                return (
-                  <div
-                    key={slot}
-                    className="py-2.5 font-mono text-sm border border-acier/10 text-acier/25 text-center relative overflow-hidden cursor-not-allowed"
-                    title="Créneau déjà pris"
-                  >
-                    <span className="line-through">{slot}</span>
-                  </div>
-                )
-              }
-
+          {/* Après-midi */}
+          <p className="font-mono text-xs uppercase tracking-widest text-acier/40 mb-2">Après-midi</p>
+          <div className="grid grid-cols-4 gap-2 mb-5">
+            {afternoonSlots.map(slot => {
+              const isTaken = takenSlots.includes(slot)
+              const isSelected = selectedSlot === slot
+              if (isTaken) return (
+                <div key={slot} className="py-2.5 font-mono text-sm border border-acier/10 text-acier/25 text-center cursor-not-allowed">
+                  <span className="line-through">{slot}</span>
+                </div>
+              )
               return (
                 <button
                   key={slot}
@@ -205,7 +271,7 @@ function Step2({ selectedDate, selectedSlot, onSelectDate, onSelectSlot }) {
           </div>
 
           {/* Légende */}
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 border border-or bg-or/10" />
               <span className="font-mono text-xs text-acier/60 uppercase tracking-widest">Disponible</span>
@@ -269,14 +335,27 @@ function Step3({ register, errors }) {
         {errors.email && <p className="text-alerte text-xs mt-1">{errors.email.message}</p>}
       </div>
 
-      <div>
-        <label className="block font-mono text-xs uppercase tracking-widest text-acier mb-2">Marque & Modèle *</label>
-        <input
-          {...register('marque')}
-          placeholder="Ex : Renault Clio IV 2020"
-          className={`w-full bg-forge border px-4 py-3 font-body text-sm text-calcaire placeholder-acier/50 outline-none transition-colors focus:border-or ${errors.marque ? 'border-alerte' : 'border-acier/20'}`}
-        />
-        {errors.marque && <p className="text-alerte text-xs mt-1">{errors.marque.message}</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block font-mono text-xs uppercase tracking-widest text-acier mb-2">Marque & Modèle *</label>
+          <input
+            {...register('marque')}
+            placeholder="Ex : Renault Clio IV 2020"
+            className={`w-full bg-forge border px-4 py-3 font-body text-sm text-calcaire placeholder-acier/50 outline-none transition-colors focus:border-or ${errors.marque ? 'border-alerte' : 'border-acier/20'}`}
+          />
+          {errors.marque && <p className="text-alerte text-xs mt-1">{errors.marque.message}</p>}
+        </div>
+        <div>
+          <label className="block font-mono text-xs uppercase tracking-widest text-acier mb-2">
+            Kilométrage <span className="text-acier/40 normal-case">(optionnel)</span>
+          </label>
+          <input
+            {...register('kilometrage')}
+            type="number"
+            placeholder="Ex : 85000"
+            className="w-full bg-forge border border-acier/20 px-4 py-3 font-body text-sm text-calcaire placeholder-acier/50 outline-none transition-colors focus:border-or"
+          />
+        </div>
       </div>
     </motion.div>
   )
@@ -303,20 +382,20 @@ export function Appointment() {
   const onSubmit = async (data) => {
     const serviceName = services.find(s => s.id === selectedService)?.title || selectedService
 
-    // Crée l'événement dans Google Calendar
     await fetch('/api/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        date:      selectedDate,
-        slot:      selectedSlot,
-        nom:       data.nom,
-        telephone: data.telephone,
-        email:     data.email,
-        marque:    data.marque,
-        service:   serviceName,
+        date:        selectedDate,
+        slot:        selectedSlot,
+        nom:         data.nom,
+        telephone:   data.telephone,
+        email:       data.email,
+        marque:      data.marque,
+        kilometrage: data.kilometrage || '',
+        service:     serviceName,
       }),
-    }).catch(() => {/* ne bloque pas si erreur réseau */})
+    }).catch(() => {})
 
     setSubmitted(true)
   }
@@ -325,7 +404,7 @@ export function Appointment() {
   if (submitted) {
     const serviceName = services.find(s => s.id === selectedService)?.title || ''
     const dateFormatted = selectedDate
-      ? new Date(selectedDate).toLocaleDateString('fr-FR', {
+      ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('fr-FR', {
           weekday: 'long', day: 'numeric', month: 'long'
         })
       : ''
@@ -365,10 +444,10 @@ export function Appointment() {
             </div>
           )}
           <p className="font-body text-acier mb-8">
-            Votre rendez-vous a été ajouté au calendrier du garage. Nous vous confirmons par SMS sous 2 heures.
+            Votre rendez-vous a été ajouté au calendrier du garage. Vous recevrez une confirmation par email sous 2 heures.
           </p>
           <div className="flex flex-col gap-3">
-            {['✓ Ajouté au calendrier Google', '✓ Confirmé sous 2h', '✓ Rappel par SMS'].map(item => (
+            {['✓ Ajouté au calendrier Google', '✓ Confirmation par email', '✓ Rappel 24h avant'].map(item => (
               <p key={item} className="font-mono text-xs uppercase tracking-widest text-or">{item}</p>
             ))}
           </div>
@@ -454,7 +533,7 @@ export function Appointment() {
           </form>
 
           <div className="flex flex-wrap justify-center gap-6 mt-10">
-            {['✓ Sans engagement', '✓ Confirmé sous 2h', '✓ Rappel par SMS'].map(item => (
+            {['✓ Sans engagement', '✓ Confirmation par email', '✓ Rappel 24h avant'].map(item => (
               <p key={item} className="font-mono text-xs uppercase tracking-widest text-acier/60">{item}</p>
             ))}
           </div>

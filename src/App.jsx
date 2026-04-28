@@ -9,6 +9,7 @@ import { Services } from './pages/Services'
 import { About } from './pages/About'
 import { Contact } from './pages/Contact'
 import { Appointment } from './pages/Appointment'
+import { Cancel } from './pages/Cancel'
 import { Phone, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 // Admin
@@ -162,6 +163,7 @@ function PublicSite() {
             <Route path="/a-propos"    element={<PageWrapper><About /></PageWrapper>} />
             <Route path="/contact"     element={<PageWrapper><Contact /></PageWrapper>} />
             <Route path="/rendez-vous" element={<PageWrapper><Appointment /></PageWrapper>} />
+            <Route path="/annulation"  element={<PageWrapper><Cancel /></PageWrapper>} />
           </Routes>
         </AnimatePresence>
       </main>
